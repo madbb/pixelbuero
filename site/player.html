@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modul-Player</title>
+<style>
+  html, body { margin: 0; background: #fff; }
+  #fehler { font-family: system-ui, sans-serif; padding: 16px; color: #8a1c1c; }
+  #fehler[hidden] { display: none; }
+</style>
+</head>
+<body>
+<div id="fehler" role="alert" hidden></div>
+<div id="player"></div>
+
+<script src="test_standalone/h5p-standalone/main.bundle.js"></script>
+<script>
+(function () {
+  // Frischer Player pro Seitenaufruf. Die Halle (index.html) lädt diese Seite in einem iframe
+  // und bekommt xAPI-Aussagen per postMessage.
+  var ziel = window.location.origin === 'null' ? '*' : window.location.origin;
+
+  function melde(nachricht) {
+    try { window.parent.postMessage(nachricht, ziel); } catch (e) { /* ohne Halle läuft der Player trotzdem */ }
+  }
+
+  function fehler(text) {
+    var box = document.getElementById('fehler');
+    box.textContent = 'Fehler: ' + text;
+    box.hidden = false;
+    melde({ typ: 'fehler', text: text });
+  }
+
+  // Nur Pfade innerhalb von site/ zulassen
+  var modul = new URLSearchParams(window.location.search).get('modul') || '';
+  if (!/^[A-Za-z0-9_\-\/]+$/.test(modul) || modul.indexOf('..') !== -1 || modul.charAt(0) === '/') {
+    fehler('Ungültiger Modulpfad.');
+    return;
+  }
+  if (!window.H5PStandalone) {
+    fehler('h5p-standalone wurde nicht geladen.');
+    return;
+  }
+
+  try {
+    var inst = new window.H5PStandalone.H5P(document.getElementById('player'), {
+      h5pJsonPath: modul,
+      frameJs: 'test_standalone/h5p-standalone/frame.bundle.js',
+      frameCss: 'test_standalone/h5p-standalone/styles/h5p.css'
+    });
+    inst.then(function () {
+      if (window.H5P && window.H5P.externalDispatcher) {
+        window.H5P.externalDispatcher.on('xAPI', function (ev) {
+          if (ev && ev.data && ev.data.statement) {
+            try { melde({ typ: 'xapi', statement: JSON.parse(JSON.stringify(ev.data.statement)) }); } catch (e) { /* Aussage nicht kopierbar */ }
+          }
+        });
+      }
+      melde({ typ: 'bereit', xapi: !!(window.H5P && window.H5P.externalDispatcher) });
+    }).catch(function (err) {
+      fehler(err && err.message ? err.message : String(err));
+    });
+  } catch (err) {
+    fehler(err.message);
+  }
+})();
+</script>
+</body>
+</html>

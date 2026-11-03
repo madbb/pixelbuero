@@ -1,0 +1,10 @@
+docs/
+muster/
+vorlage/
+generator/
+build/
+CLAUDE.md
+.claude/
+*.h5p
+__pycache__/
+*.pyc

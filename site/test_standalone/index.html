@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wiedergabetest h5p-standalone</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0 auto; padding: 16px; max-width: 960px; background: #f4f1ea; color: #222; }
+  h1 { font-size: 1.2rem; }
+  #player { background: #fff; min-height: 200px; }
+  #status { margin: 8px 0; font-size: 0.9rem; }
+  textarea { width: 100%; height: 280px; box-sizing: border-box; font-family: Consolas, monospace; font-size: 0.85rem; }
+  button { margin: 4px 4px 0 0; }
+</style>
+</head>
+<body>
+<h1>Wiedergabetest: test_v01_generiert (h5p-standalone 3.8.0)</h1>
+<div id="player"></div>
+<div id="status">Lade Player ...</div>
+<div>
+  <button id="leeren" type="button">Protokoll leeren</button>
+  <button id="kopieren" type="button">Protokoll in die Zwischenablage</button>
+</div>
+<textarea id="log" readonly aria-label="xAPI-Ereignisse"></textarea>
+
+<script src="h5p-standalone/main.bundle.js"></script>
+<script>
+(function () {
+  var log = document.getElementById('log');
+  var status = document.getElementById('status');
+  var nr = 0;
+
+  function zeile(text) {
+    nr += 1;
+    var t = new Date().toLocaleTimeString('de-DE');
+    log.value += nr + ' ' + t + '  ' + text + '\n';
+    log.scrollTop = log.scrollHeight;
+    log.setAttribute('data-log', log.value);
+  }
+
+  function text(obj) {
+    if (!obj) { return ''; }
+    if (typeof obj === 'string') { return obj; }
+    return obj['de-DE'] || obj['de'] || obj['en-US'] || obj[Object.keys(obj)[0]] || '';
+  }
+
+  function verb(v) {
+    if (!v) { return '(kein Verb)'; }
+    var name = text(v.display);
+    var id = v.id ? v.id.split('/').pop() : '';
+    return name && name !== id ? name + ' (' + id + ')' : id;
+  }
+
+  function ereignis(ev) {
+    var s = ev.data && ev.data.statement;
+    if (!s) { zeile('xAPI ohne statement'); return; }
+    var o = s.object || {};
+    var d = o.definition || {};
+    var z = 'Verb: ' + verb(s.verb) + ' | Objekt: ' + (text(d.name) || o.id || '?');
+    if (d.type) { z += ' | Typ: ' + d.type.split('/').pop(); }
+    if (s.result) {
+      var r = s.result;
+      var teile = [];
+      if (r.score) { teile.push('Punkte ' + r.score.raw + ' von ' + r.score.max + (r.score.scaled !== undefined ? ' (skaliert ' + r.score.scaled + ')' : '')); }
+      if (r.completion !== undefined) { teile.push('abgeschlossen: ' + r.completion); }
+      if (r.success !== undefined) { teile.push('bestanden: ' + r.success); }
+      if (r.duration) { teile.push('Dauer ' + r.duration); }
+      if (r.response) { teile.push('Antwort: ' + r.response); }
+      if (teile.length) { z += ' | Ergebnis: ' + teile.join(', '); }
+    }
+    zeile(z);
+  }
+
+  window.addEventListener('error', function (e) {
+    zeile('FEHLER im Fenster: ' + e.message + (e.filename ? ' (' + e.filename + ':' + e.lineno + ')' : ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    zeile('FEHLER (Promise): ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
+
+  document.getElementById('leeren').addEventListener('click', function () { log.value = ''; nr = 0; });
+  document.getElementById('kopieren').addEventListener('click', function () {
+    log.select();
+    try { document.execCommand('copy'); } catch (e) { /* Kopieren nicht verfügbar */ }
+  });
+
+  try {
+    var h5p = new H5PStandalone.H5P(document.getElementById('player'), {
+      h5pJsonPath: 'h5p/test_v01',
+      frameJs: 'h5p-standalone/frame.bundle.js',
+      frameCss: 'h5p-standalone/styles/h5p.css'
+    });
+    h5p.then(function () {
+      status.textContent = 'Player geladen. xAPI-Ereignisse erscheinen unten.';
+      zeile('Player gestartet');
+      if (window.H5P && H5P.externalDispatcher) {
+        H5P.externalDispatcher.on('xAPI', ereignis);
+        zeile('xAPI-Lauscher angemeldet');
+      } else {
+        zeile('WARNUNG: H5P.externalDispatcher nicht gefunden, keine xAPI-Ereignisse');
+      }
+    }).catch(function (err) {
+      status.textContent = 'Player konnte nicht starten.';
+      zeile('FEHLER beim Start: ' + (err && err.message ? err.message : err));
+    });
+  } catch (err) {
+    status.textContent = 'Player konnte nicht starten.';
+    zeile('FEHLER beim Start: ' + err.message);
+  }
+})();
+</script>
+</body>
+</html>

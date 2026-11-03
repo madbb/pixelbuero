@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "beschreibung": "Raeume, Tueren und Module der Halle. Koordinaten in Pixeln auf der Zeichenflaeche (groesse). Rechtecke haben x, y, w, h. start und spawn sind die linke obere Ecke der Figur.",
+  "groesse": { "b": 320, "h": 180 },
+  "figur": { "w": 10, "h": 12, "tempo": 62 },
+  "start": "buero",
+  "module": [
+    {
+      "id": "test_v01",
+      "name": "Projektmanagement, klassisch gegen agil",
+      "pfad": "test_standalone/h5p/test_v01",
+      "raenge": [
+        { "ab": 0, "name": "Praktikant" },
+        { "ab": 4, "name": "Junior" },
+        { "ab": 7, "name": "Senior" },
+        { "ab": 10, "name": "Studioleitung" }
+      ]
+    }
+  ],
+  "raeume": [
+    {
+      "id": "buero",
+      "name": "Büro",
+      "hintergrund": "#cdbf9f",
+      "hintergrund2": "#c2b392",
+      "start": { "x": 150, "y": 140 },
+      "kollision": [
+        { "x": 0, "y": 0, "w": 320, "h": 24, "farbe": "#4a4458" },
+        { "x": 0, "y": 172, "w": 320, "h": 8, "farbe": "#4a4458" },
+        { "x": 0, "y": 0, "w": 8, "h": 180, "farbe": "#4a4458" },
+        { "x": 312, "y": 0, "w": 8, "h": 180, "farbe": "#4a4458" },
+        { "x": 120, "y": 84, "w": 56, "h": 16, "farbe": "#8a5a3a" },
+        { "x": 16, "y": 60, "w": 14, "h": 40, "farbe": "#6b4a32" },
+        { "x": 282, "y": 138, "w": 14, "h": 16, "farbe": "#3f9b4f" }
+      ],
+      "objekte": [
+        { "id": "teppich-aussen", "typ": "deko", "x": 104, "y": 70, "w": 88, "h": 48, "farbe": "#8e4a5c", "z": -1 },
+        { "id": "teppich-innen", "typ": "deko", "x": 108, "y": 74, "w": 80, "h": 40, "farbe": "#a85d70", "z": -1 },
+        { "id": "whiteboard", "typ": "deko", "x": 100, "y": 6, "w": 48, "h": 12, "farbe": "#e9e6df", "z": 1 },
+        { "id": "wandleiste", "typ": "deko", "x": 0, "y": 20, "w": 320, "h": 4, "farbe": "#2f2b3a", "z": 1 },
+        {
+          "id": "kaffee",
+          "typ": "info",
+          "name": "Kaffeemaschine",
+          "x": 276, "y": 24, "w": 18, "h": 18,
+          "farbe": "#2f2f38",
+          "kollision": true,
+          "zone": 6,
+          "text": "Der Kaffee ist heiß. Das Budget nicht."
+        }
+      ],
+      "tueren": [
+        {
+          "id": "tuer-modul",
+          "name": "Tür 1: Projektmanagement",
+          "x": 40, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "modul", "id": "test_v01" }
+        },
+        {
+          "id": "tuer-flur",
+          "name": "Tür zum Flur",
+          "x": 170, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "raum", "id": "flur", "spawn": { "x": 263, "y": 40 } }
+        },
+        {
+          "id": "tuer-gesperrt",
+          "name": "Tür 2: gesperrt",
+          "x": 236, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "gesperrt", "hinweis": "In Arbeit" }
+        }
+      ]
+    },
+    {
+      "id": "flur",
+      "name": "Flur",
+      "hintergrund": "#b7c3cf",
+      "hintergrund2": "#abb8c4",
+      "start": { "x": 263, "y": 40 },
+      "kollision": [
+        { "x": 0, "y": 0, "w": 320, "h": 24, "farbe": "#454d63" },
+        { "x": 0, "y": 172, "w": 320, "h": 8, "farbe": "#454d63" },
+        { "x": 0, "y": 0, "w": 8, "h": 180, "farbe": "#454d63" },
+        { "x": 312, "y": 0, "w": 8, "h": 180, "farbe": "#454d63" },
+        { "x": 110, "y": 100, "w": 100, "h": 12, "farbe": "#8a5a3a" },
+        { "x": 20, "y": 130, "w": 14, "h": 16, "farbe": "#3f9b4f" }
+      ],
+      "objekte": [
+        { "id": "laeufer", "typ": "deko", "x": 8, "y": 60, "w": 304, "h": 30, "farbe": "#8e6a7a", "z": -1 },
+        { "id": "wandleiste", "typ": "deko", "x": 0, "y": 20, "w": 320, "h": 4, "farbe": "#2d3144", "z": 1 }
+      ],
+      "tueren": [
+        {
+          "id": "tuer-a",
+          "name": "Tür A: gesperrt",
+          "x": 20, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "gesperrt", "hinweis": "In Arbeit" }
+        },
+        {
+          "id": "tuer-modul",
+          "name": "Tür B: Projektmanagement",
+          "x": 88, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "modul", "id": "test_v01" }
+        },
+        {
+          "id": "tuer-c",
+          "name": "Tür C: gesperrt",
+          "x": 156, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "gesperrt", "hinweis": "In Arbeit" }
+        },
+        {
+          "id": "tuer-buero",
+          "name": "Zurück ins Büro",
+          "x": 254, "y": 8, "w": 28, "h": 16,
+          "ziel": { "typ": "raum", "id": "buero", "spawn": { "x": 179, "y": 40 } }
+        }
+      ]
+    }
+  ]
+}

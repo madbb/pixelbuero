@@ -107,7 +107,7 @@
    },
    "interaktion": {
     "typ": "gesperrt",
-    "hinweis": "In Arbeit: Rückverfolgung und Änderungen"
+    "hinweis": "Dieses Flipchart wartet auf neue Projekte"
    },
    "sprite": {
     "datei": "assets/moebel/pinnwand.png",
@@ -147,7 +147,7 @@
    },
    "interaktion": {
     "typ": "text",
-    "text": "Der Kaffee ist heiß. Das Budget nicht."
+    "text": "Das erinnert mich daran, das ich neue Bohnen holen muss."
    },
    "sprite": {
     "datei": "assets/moebel/kaffeemaschine.png",
@@ -308,7 +308,7 @@
   },
   {
    "id": "katze",
-   "name": "Katze",
+   "name": "Chucky",
    "raum": "buero",
    "art": "boden",
    "quelle": "Katze.png",
@@ -327,7 +327,7 @@
    },
    "interaktion": {
     "typ": "text",
-    "text": "Die Katze schläft. Besser nicht wecken."
+    "text": "Chucky schläft... wie immer."
    },
    "sprite": {
     "datei": "assets/moebel/katze.png",

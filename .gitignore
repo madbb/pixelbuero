@@ -8,3 +8,7 @@ CLAUDE.md
 *.h5p
 __pycache__/
 *.pyc
+texte/
+bilder/
+archiv/
+.claude/settings.local.json

@@ -1,0 +1,84 @@
+{
+ "beschreibung": "Messwerte aus assets/illustration/raum/referenz_gesamt.png (1672 x 941, nur Referenz). Umrechnung auf logische Pixel: Faktor 1280 / breite_px. fuss_x_prozent und fuss_y_prozent: Fußposition (x Mitte, y Unterkante) in Prozent der Bildbreite und Bildhöhe, hoehe_px und breite_px in Referenzpixeln. Gemessen mit tools/referenz_messen.py (Unterschied zur Farbe des Papiers, dünne Wandlinien weggefiltert).",
+ "datei": "assets/illustration/raum/referenz_gesamt.png",
+ "breite_px": 1672,
+ "hoehe_px": 941,
+ "faktor": 0.76555,
+ "wandlinie": {
+  "y_px": 378,
+  "y_prozent": 40.17
+ },
+ "tuer": {
+  "hoehe_px": 317,
+  "rahmen_y_px": [
+   61,
+   378
+  ],
+  "rahmen_x_px": [
+   1120,
+   1349
+  ]
+ },
+ "objekte": {
+  "aktenschrank": {
+   "bbox": [
+    80,
+    65,
+    320,
+    583
+   ],
+   "breite_px": 240,
+   "hoehe_px": 518,
+   "fuss_x_prozent": 11.96,
+   "fuss_y_prozent": 61.96
+  },
+  "schreibtisch": {
+   "bbox": [
+    477,
+    307,
+    1020,
+    715
+   ],
+   "breite_px": 543,
+   "hoehe_px": 408,
+   "fuss_x_prozent": 44.77,
+   "fuss_y_prozent": 75.98
+  },
+  "stuhl": {
+   "bbox": [
+    1032,
+    408,
+    1214,
+    714
+   ],
+   "breite_px": 182,
+   "hoehe_px": 306,
+   "fuss_x_prozent": 67.17,
+   "fuss_y_prozent": 75.88
+  },
+  "pflanze": {
+   "bbox": [
+    1403,
+    112,
+    1619,
+    437
+   ],
+   "breite_px": 216,
+   "hoehe_px": 325,
+   "fuss_x_prozent": 90.37,
+   "fuss_y_prozent": 46.44
+  },
+  "teppich": {
+   "bbox": [
+    231,
+    745,
+    1429,
+    920
+   ],
+   "breite_px": 1198,
+   "hoehe_px": 175,
+   "fuss_x_prozent": 49.64,
+   "fuss_y_prozent": 97.77
+  }
+ }
+}

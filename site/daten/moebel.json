@@ -1,0 +1,388 @@
+{
+ "version": 3,
+ "beschreibung": "Möbel der Räume im Illustrationsstil, logische Pixel der Halle (1280 x 720). moebel_skala (Startwert 0,75, URL-Parameter ?moebel_skala=) skaliert alle Möbel mit Referenz. groesse art referenz: so groß wie in der Referenz (referenz.json, Höhe oder Breite) mal moebel_skala. groesse art relativ: hoehe_a mal Höhe A des Aktenschranks im Spiel, seitenverh (Breite durch Höhe) nur für Platzhalter. groesse art breite_wie: Breite wie ein anderes Möbelstück, seitenverh (Breite durch Höhe) für den Platzhalter. Das Seitenverhältnis der Datei bleibt erhalten, die Pixelgröße der Datei ist egal. position referenz: Fußpunkt aus der Referenz (Prozent von Breite und Höhe). stellung wand: fuss.y ist die wandlinie des Raums (welt.json) plus wandabstand, nur fuss.x steht in der Datei. stellung frei: fuss.x und fuss.y in der Datei. kollision modus unten: unterer Teil (anteil der Höhe, mindestens min_h Pixel) über die volle Breite, null heißt keine Kollision. interaktionspunkt ist relativ zum Fußpunkt (standard dx 0, dy 20), mit bezug true relativ zum Fußpunkt des Bezugs. zonen_radius ist die halbe Kantenlänge der Zone. bezug: Position relativ zu einem anderen Möbelstück (dx_b als Anteil von dessen Breite, dy_h als Anteil von dessen Höhe), vor true zeichnet vor dem Bezug. art teppich liegt unter allem. Danach python tools/moebel_bauen.py (Dateien: nie hoch skaliert, höchstens das 2-Fache der Größe bei dateiskala). sprite schreibt das Werkzeug. NEU: groesse art prozent (breite in Prozent der Bühnenbreite, Seitenverhältnis der Datei) und position prozent (fuss_prozent x und y in Prozent von Bühnenbreite und Bühnenhöhe, Fußpunkt = Mitte der Unterkante). moebel_skala ist dann ein Faktor auf alle Größen (Startwert 1,0). aktiv false schaltet ein Möbelstück ab (nicht gezeichnet, keine Klick- und Kollisionsfläche). kollision.tiefe_prozent: Streifen am Fuß, Tiefe in Prozent der Bühnenhöhe.",
+ "stil": "illustration",
+ "quelle_ordner": "assets/illustration/moebel",
+ "ausgabe_ordner": "site/assets/moebel",
+ "max_aufloesung": 2,
+ "dateiskala": 1.0,
+ "moebel_skala": 1.0,
+ "wandabstand": 12,
+ "zonen_radius": 26,
+ "moebel": [
+  {
+   "id": "teppich",
+   "name": "Teppich",
+   "raum": "buero",
+   "art": "teppich",
+   "quelle": "teppich.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 73
+   },
+   "position": "prozent",
+   "kollision": null,
+   "interaktionspunkt": null,
+   "interaktion": null,
+   "sprite": {
+    "datei": "assets/moebel/teppich.png",
+    "platzhalter": false,
+    "quelle_benutzt": "teppich.png",
+    "original_deckung": [
+     2053,
+     310
+    ],
+    "b": 1869,
+    "h": 282
+   },
+   "fuss_prozent": {
+    "x": 50,
+    "y": 98
+   }
+  },
+  {
+   "id": "aktenschrank",
+   "name": "Aktenschrank",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "aktenschrank.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 8.4
+   },
+   "position": "prozent",
+   "kollision": {
+    "modus": "unten",
+    "tiefe_prozent": 3
+   },
+   "interaktionspunkt": {
+    "dx": 0,
+    "dy": 20
+   },
+   "interaktion": {
+    "typ": "frage",
+    "vortext": "Er enthält ein Lastenheft aus dem Jahr 2011. Niemand traut sich, es zu lesen.",
+    "frage": "Aktenschrank öffnen? Lernpfad: Lastenheft und Pflichtenheft, etwa 12 bis 15 Minuten.",
+    "ja": "Öffnen",
+    "nein": "Später",
+    "ziel": {
+     "typ": "modul",
+     "id": "lernpfad-01-akten"
+    }
+   },
+   "sprite": {
+    "datei": "assets/moebel/aktenschrank.png",
+    "platzhalter": false,
+    "quelle_benutzt": "aktenschrank.png",
+    "original_deckung": [
+     595,
+     1401
+    ],
+    "b": 270,
+    "h": 600
+   },
+   "fuss_prozent": {
+    "x": 10,
+    "y": 43
+   }
+  },
+  {
+   "id": "pinnwand",
+   "name": "Flipchart",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "Flipchart.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 10
+   },
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": {
+    "dx": 0,
+    "dy": 20
+   },
+   "interaktion": {
+    "typ": "gesperrt",
+    "hinweis": "In Arbeit: Rückverfolgung und Änderungen"
+   },
+   "sprite": {
+    "datei": "assets/moebel/pinnwand.png",
+    "platzhalter": false,
+    "quelle_benutzt": "Flipchart.png",
+    "original_deckung": [
+     733,
+     1381
+    ],
+    "b": 256,
+    "h": 482
+   },
+   "position": "prozent",
+   "fuss_prozent": {
+    "x": 61,
+    "y": 44.5
+   }
+  },
+  {
+   "id": "kaffeemaschine",
+   "name": "Kaffeemaschine",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "kaffeestation.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 11.4
+   },
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": {
+    "dx": 0,
+    "dy": 20
+   },
+   "interaktion": {
+    "typ": "text",
+    "text": "Der Kaffee ist heiß. Das Budget nicht."
+   },
+   "sprite": {
+    "datei": "assets/moebel/kaffeemaschine.png",
+    "platzhalter": false,
+    "quelle_benutzt": "kaffeestation.png",
+    "original_deckung": [
+     669,
+     1095
+    ],
+    "b": 292,
+    "h": 478
+   },
+   "position": "prozent",
+   "fuss_prozent": {
+    "x": 92.5,
+    "y": 82
+   }
+  },
+  {
+   "id": "schreibtisch",
+   "name": "Schreibtisch",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "schreibtisch.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 33
+   },
+   "position": "prozent",
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": null,
+   "interaktion": null,
+   "sprite": {
+    "datei": "assets/moebel/schreibtisch.png",
+    "platzhalter": false,
+    "quelle_benutzt": "schreibtisch.png",
+    "original_deckung": [
+     1166,
+     906
+    ],
+    "b": 845,
+    "h": 656
+   },
+   "fuss_prozent": {
+    "x": 45,
+    "y": 76.5
+   }
+  },
+  {
+   "id": "stuhl",
+   "name": "Stuhl",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "stuhl.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 11
+   },
+   "position": "prozent",
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": null,
+   "interaktion": null,
+   "sprite": {
+    "datei": "assets/moebel/stuhl.png",
+    "platzhalter": false,
+    "quelle_benutzt": "stuhl.png",
+    "original_deckung": [
+     685,
+     1151
+    ],
+    "b": 282,
+    "h": 473
+   },
+   "fuss_prozent": {
+    "x": 67,
+    "y": 76
+   }
+  },
+  {
+   "id": "telefon",
+   "name": "Telefon",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "Telefon.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 5.06
+   },
+   "bezug": {
+    "moebel": "schreibtisch",
+    "dx_b": 0.355,
+    "dy_h": -0.455,
+    "vor": true
+   },
+   "kollision": null,
+   "interaktionspunkt": {
+    "bezug": true,
+    "dx": 140,
+    "dy": 45
+   },
+   "interaktion": {
+    "typ": "text",
+    "text": "Das Telefon klingelt. Anruf folgt."
+   },
+   "sprite": {
+    "datei": "assets/moebel/telefon.png",
+    "platzhalter": false,
+    "quelle_benutzt": "Telefon.png",
+    "original_deckung": [
+     1213,
+     895
+    ],
+    "b": 130,
+    "h": 96
+   }
+  },
+  {
+   "id": "pflanze",
+   "name": "Pflanze",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "pflanze.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 13
+   },
+   "position": "prozent",
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": null,
+   "interaktion": null,
+   "sprite": {
+    "datei": "assets/moebel/pflanze.png",
+    "platzhalter": false,
+    "quelle_benutzt": "pflanze.png",
+    "original_deckung": [
+     805,
+     1175
+    ],
+    "b": 333,
+    "h": 486
+   },
+   "fuss_prozent": {
+    "x": 91,
+    "y": 46
+   }
+  },
+  {
+   "id": "katze",
+   "name": "Katze",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": "Katze.png",
+   "groesse": {
+    "art": "prozent",
+    "breite": 10
+   },
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": {
+    "dx": 0,
+    "dy": 20
+   },
+   "interaktion": {
+    "typ": "text",
+    "text": "Die Katze schläft. Besser nicht wecken."
+   },
+   "sprite": {
+    "datei": "assets/moebel/katze.png",
+    "platzhalter": false,
+    "quelle_benutzt": "Katze.png",
+    "original_deckung": [
+     858,
+     1077
+    ],
+    "b": 256,
+    "h": 321
+   },
+   "position": "prozent",
+   "fuss_prozent": {
+    "x": 10,
+    "y": 90
+   }
+  },
+  {
+   "id": "testplatz",
+   "name": "Testplatz",
+   "raum": "buero",
+   "art": "boden",
+   "quelle": null,
+   "groesse": {
+    "art": "prozent",
+    "breite": 11,
+    "seitenverh": 0.8889
+   },
+   "kollision": {
+    "modus": "unten",
+    "anteil": 0.3,
+    "min_h": 24
+   },
+   "interaktionspunkt": {
+    "dx": 0,
+    "dy": 20
+   },
+   "interaktion": {
+    "typ": "gesperrt",
+    "hinweis": "In Arbeit: Prüfbare Anforderungen und Abnahme"
+   },
+   "sprite": {
+    "datei": "assets/moebel/testplatz.png",
+    "platzhalter": true,
+    "quelle_benutzt": null,
+    "b": 267,
+    "h": 300
+   },
+   "position": "prozent",
+   "fuss_prozent": {
+    "x": 25,
+    "y": 42
+   },
+   "aktiv": false
+  }
+ ]
+}

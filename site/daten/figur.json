@@ -1,0 +1,449 @@
+{
+  "version": 1,
+  "beschreibung": "Figur der Halle, logische Pixel (1280 x 720). Tiefenskalierung: Höhe h(y) = h_oben + (h_unten - h_oben) * t, t = (y - wandlinie) / (boden_unten - wandlinie) zwischen 0 und 1. h_oben = figur_oben mal Türhöhe (aus referenz.json), h_unten = figur_unten mal h_oben. Fußbox, Bodenschatten, Umriss und Tempo skalieren mit der Höhe. fussbox_rel: Breite und Tiefe der Fußbox als Vielfache der Höhe, die Box steht auf dem Fußpunkt. tempo_h: Laufgeschwindigkeit in Figurhöhen pro Sekunde. umriss: Cremerand (an, breite in logischen Pixeln bei h_oben, farbe aus dem Raumhintergrund). schatten: weicher Bodenschatten (Radien als Vielfache der Höhe). Die Sprites (animationen) werden glatt auf die Höhe skaliert (Quelle: animationen.gehen.hoehe). URL-Parameter figur_oben und figur_unten überschreiben. NEU (PNG-Frames): quelle_ordner enthält Walking (acht Richtungen) und Idle (north, south), je frame_000 bis frame_007. Je Zeile steht fuss als Liste, ein Fußpunkt [x, y] pro Frame (x Mitte des Oberkörpers, y Unterkante der sichtbaren Figur). massstab_hoehe: sichtbare Höhe von idle_sued Frame 0, darauf wird alles skaliert (statt animationen.gehen.hoehe). darstellung pixel: ohne Glättung zeichnen. Alte GIF-Fassung: archiv/figur_gif/.",
+  "quelle_ordner": "assets/illustration/figur",
+  "richtungen": [
+    "s",
+    "sw",
+    "w",
+    "nw",
+    "n",
+    "ne",
+    "e",
+    "se"
+  ],
+  "start_richtung": "s",
+  "richtungswechsel_ms": 100,
+  "idle_zuordnung": {
+    "n": "idle_nord",
+    "ne": "idle_nord",
+    "nw": "idle_nord",
+    "s": "idle_sued",
+    "se": "idle_sued",
+    "sw": "idle_sued",
+    "w": "idle_sued",
+    "e": "idle_sued"
+  },
+  "animationen": {
+    "gehen": {
+      "sheet": "assets/figur/gehen.png",
+      "fps": 12,
+      "zeilen": [
+        {
+          "name": "s",
+          "ordner": "south",
+          "fuss": [
+            [
+              66.5,
+              112
+            ],
+            [
+              65.5,
+              116
+            ],
+            [
+              64.0,
+              119
+            ],
+            [
+              65.5,
+              116
+            ],
+            [
+              66.5,
+              112
+            ],
+            [
+              69.0,
+              116
+            ],
+            [
+              70.5,
+              119
+            ],
+            [
+              68.5,
+              115
+            ]
+          ]
+        },
+        {
+          "name": "sw",
+          "ordner": "south-west",
+          "fuss": [
+            [
+              67.0,
+              116
+            ],
+            [
+              65.0,
+              114
+            ],
+            [
+              63.0,
+              114
+            ],
+            [
+              62.0,
+              112
+            ],
+            [
+              60.5,
+              114
+            ],
+            [
+              58.5,
+              120
+            ],
+            [
+              60.5,
+              122
+            ],
+            [
+              63.0,
+              119
+            ]
+          ]
+        },
+        {
+          "name": "w",
+          "ordner": "west",
+          "fuss": [
+            [
+              65.5,
+              113
+            ],
+            [
+              66.0,
+              112
+            ],
+            [
+              65.5,
+              110
+            ],
+            [
+              63.5,
+              108
+            ],
+            [
+              61.5,
+              107
+            ],
+            [
+              61.0,
+              110
+            ],
+            [
+              59.5,
+              115
+            ],
+            [
+              62.0,
+              115
+            ]
+          ]
+        },
+        {
+          "name": "nw",
+          "ordner": "north-west",
+          "fuss": [
+            [
+              65.0,
+              113
+            ],
+            [
+              65.0,
+              113
+            ],
+            [
+              64.5,
+              114
+            ],
+            [
+              60.5,
+              118
+            ],
+            [
+              62.0,
+              115
+            ],
+            [
+              65.0,
+              108
+            ],
+            [
+              65.0,
+              113
+            ],
+            [
+              65.0,
+              111
+            ]
+          ]
+        },
+        {
+          "name": "n",
+          "ordner": "north",
+          "fuss": [
+            [
+              67.5,
+              113
+            ],
+            [
+              75.0,
+              113
+            ],
+            [
+              75.0,
+              116
+            ],
+            [
+              76.5,
+              115
+            ],
+            [
+              76.0,
+              110
+            ],
+            [
+              75.0,
+              113
+            ],
+            [
+              72.5,
+              116
+            ],
+            [
+              66.5,
+              112
+            ]
+          ]
+        },
+        {
+          "name": "ne",
+          "ordner": "north-east",
+          "fuss": [
+            [
+              67.0,
+              113
+            ],
+            [
+              67.0,
+              113
+            ],
+            [
+              67.5,
+              114
+            ],
+            [
+              71.5,
+              118
+            ],
+            [
+              70.0,
+              115
+            ],
+            [
+              67.0,
+              108
+            ],
+            [
+              67.0,
+              113
+            ],
+            [
+              67.0,
+              111
+            ]
+          ]
+        },
+        {
+          "name": "e",
+          "ordner": "east",
+          "fuss": [
+            [
+              66.5,
+              113
+            ],
+            [
+              66.0,
+              112
+            ],
+            [
+              66.5,
+              110
+            ],
+            [
+              68.5,
+              108
+            ],
+            [
+              70.5,
+              107
+            ],
+            [
+              71.0,
+              110
+            ],
+            [
+              72.5,
+              115
+            ],
+            [
+              70.0,
+              115
+            ]
+          ]
+        },
+        {
+          "name": "se",
+          "ordner": "south-east",
+          "fuss": [
+            [
+              69.0,
+              116
+            ],
+            [
+              71.0,
+              114
+            ],
+            [
+              73.0,
+              114
+            ],
+            [
+              74.0,
+              112
+            ],
+            [
+              75.5,
+              114
+            ],
+            [
+              77.5,
+              120
+            ],
+            [
+              75.5,
+              122
+            ],
+            [
+              73.0,
+              119
+            ]
+          ]
+        }
+      ],
+      "ordner": "Walking",
+      "frame_b": 136,
+      "frame_h": 136,
+      "frames": 8
+    },
+    "idle": {
+      "sheet": "assets/figur/idle.png",
+      "fps": 3,
+      "zeilen": [
+        {
+          "name": "idle_nord",
+          "ordner": "north",
+          "fuss": [
+            [
+              67.5,
+              113
+            ],
+            [
+              67.5,
+              113
+            ],
+            [
+              67.5,
+              113
+            ],
+            [
+              67.5,
+              113
+            ],
+            [
+              67.5,
+              113
+            ],
+            [
+              67.5,
+              113
+            ],
+            [
+              67.5,
+              113
+            ],
+            [
+              67.0,
+              113
+            ]
+          ]
+        },
+        {
+          "name": "idle_sued",
+          "ordner": "south",
+          "fuss": [
+            [
+              66.5,
+              112
+            ],
+            [
+              67.0,
+              112
+            ],
+            [
+              67.0,
+              112
+            ],
+            [
+              67.5,
+              112
+            ],
+            [
+              67.5,
+              112
+            ],
+            [
+              67.0,
+              112
+            ],
+            [
+              67.0,
+              112
+            ],
+            [
+              66.5,
+              112
+            ]
+          ]
+        }
+      ],
+      "ordner": "Idle",
+      "frame_b": 132,
+      "frame_h": 132,
+      "frames": 8
+    }
+  },
+  "fussbox_rel": {
+    "breite": 0.2,
+    "tiefe": 0.1
+  },
+  "umriss": {
+    "an": true,
+    "breite": 2,
+    "farbe": "#FEE5C6"
+  },
+  "schatten": {
+    "farbe": "#1F3A5F",
+    "deckkraft": 0.25,
+    "rx": 0.28,
+    "ry": 0.07
+  },
+  "figur_oben": 0.8,
+  "figur_unten": 1.4,
+  "tempo_h": 1.65,
+  "massstab_hoehe": 85,
+  "darstellung": "pixel"
+}

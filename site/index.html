@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixelbüro</title>
+<title>Probezeit</title>
 <style>
   :root {
     --bg: #2b2833;
@@ -20,26 +20,90 @@
     font-family: system-ui, sans-serif;
     line-height: 1.45;
     padding-inline: 16px;
-    padding-block: 12px 32px;
+    padding-block: 6px 24px;
   }
-  main { max-width: 1000px; margin: 0 auto; }
-  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  main { margin: 0 auto; }
+  h1 { font-size: 1rem; margin: 0 0 4px; }
   p { margin: 4px 0 10px; }
   #stage { display: flex; justify-content: center; }
+  #buehne { position: relative; line-height: 0; }
   canvas {
     display: block;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
     background: #000;
     outline-offset: 4px;
   }
   canvas:focus-visible { outline: 3px solid var(--akzent); }
-  #ergebnis { min-height: 1.5em; margin-top: 8px; color: var(--akzent); }
+  #start {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    font: inherit;
+    font-size: 1.15rem;
+    line-height: 1.4;
+    padding: 16px;
+    color: var(--text);
+    background: rgba(14, 12, 18, 0.72);
+    border: 0;
+    cursor: pointer;
+  }
+  #start[hidden] { display: none; }
+  #ergebnis { min-height: 1.3em; margin-top: 6px; color: var(--akzent); font-size: 0.92rem; }
+  #leiste { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
+  #leiste p { margin: 0; font-size: 0.92rem; }
+  #vollbild {
+    font: inherit;
+    font-size: 0.92rem;
+    padding: 4px 12px;
+    color: var(--text);
+    background: transparent;
+    border: 2px solid var(--akzent);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  /* Vollbild: nur die Halle, der Statustext bleibt für Screenreader */
+  body.vollbild { padding: 0; overflow: hidden; }
+  body.vollbild main { height: 100vh; display: flex; align-items: center; justify-content: center; }
+  body.vollbild h1, body.vollbild #leiste, body.vollbild nav { display: none; }
+  body.vollbild #ergebnis {
+    position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
   #nav-titel:focus { outline: none; }
   nav h2 { font-size: 1.05rem; margin: 16px 0 4px; }
   nav ul { margin: 0; padding-left: 1.2em; }
   a { color: var(--link); }
   a:focus-visible, button:focus-visible { outline: 3px solid var(--akzent); outline-offset: 2px; }
+
+  #dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    background: rgba(14, 12, 18, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #dialog[hidden] { display: none; }
+  #dialog-box {
+    max-width: 460px;
+    background: var(--panel);
+    border: 2px solid var(--akzent);
+    border-radius: 6px;
+    padding: 16px 20px;
+  }
+  #dialog-vortext { font-style: italic; margin-top: 0; }
+  #dialog-frage { font-weight: 600; }
+  #dialog-knoepfe { display: flex; gap: 12px; margin-top: 12px; }
+  #dialog-knoepfe button {
+    font: inherit;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid var(--akzent);
+    background: transparent;
+    color: var(--text);
+  }
+  #dialog-knoepfe #dialog-ja { background: var(--akzent); color: #1d1a22; }
 
   #overlay {
     position: fixed;
@@ -83,20 +147,37 @@
 </head>
 <body>
 <main>
-  <h1>Pixelbüro</h1>
-  <p>Steuerung: Pfeiltasten oder WASD zum Laufen, Leertaste oder Enter an einer Tür oder Maschine. Klicke zuerst auf die Halle oder springe mit Tab hinein.</p>
+  <h1>Probezeit</h1>
 
   <div id="stage">
-    <canvas id="halle" width="320" height="180" tabindex="0"
-            aria-label="Pixelbüro, eine Halle mit Türen. Die Türen sind auch in der Liste unter der Halle erreichbar."></canvas>
+    <div id="buehne">
+      <canvas id="halle" width="1280" height="720" tabindex="0"
+              aria-label="Probezeit, ein Büro mit Möbeln und einer Tür. Türen und Objekte sind auch in der Liste unter der Halle erreichbar."></canvas>
+      <button id="start" type="button">Klicken zum Starten, dann Pfeiltasten oder WASD</button>
+    </div>
   </div>
   <div id="ergebnis" role="status" aria-live="polite"></div>
+  <div id="leiste">
+    <button id="vollbild" type="button">Vollbild</button>
+    <p id="hinweis">Steuerung: Pfeiltasten oder WASD zum Laufen, Leertaste oder Enter an einer Tür oder einem Objekt, F für Vollbild.</p>
+  </div>
 
-  <nav aria-label="Türen">
-    <h2 id="nav-titel" tabindex="-1">Türen</h2>
+  <nav aria-label="Türen und Objekte">
+    <h2 id="nav-titel" tabindex="-1">Türen und Objekte</h2>
     <ul id="tuerliste"></ul>
   </nav>
 </main>
+
+<div id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-frage" hidden>
+  <div id="dialog-box">
+    <p id="dialog-vortext"></p>
+    <p id="dialog-frage"></p>
+    <div id="dialog-knoepfe">
+      <button id="dialog-ja" type="button">Öffnen</button>
+      <button id="dialog-nein" type="button">Später</button>
+    </div>
+  </div>
+</div>
 
 <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-titel" hidden>
   <div id="overlay-kopf">

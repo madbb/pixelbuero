@@ -76,10 +76,7 @@ Zwei Adressparameter helfen beim Einrichten:
 Das Projekt ist in Arbeit.
 
 - Büro, Figur, Wegfindung und Kollision sind umgesetzt und geprüft. Lernpfad 01 ist im Player in Chrome durchgespielt.
-- Nicht getestet sind Firefox, Safari, Touch-Geräte und die Einbindung in Moodle.
-- Das Ereignis, mit dem ein Lernpfad den Abschluss an den Hub meldet, ist noch ungetestet.
-- Die Seite im Netz zeigt zum Teil noch den älteren Pixelstand.
 
 ## Grafiken
 
-Die Spielfigur stammt aus PixelLab. Die Raum- und Möbelillustrationen sowie die Bilder der Lernpfade sind mit KI-Werkzeugen erzeugt.
+Die Spielfigur stammt aus PixelLab und wurde mit Aseprite verbessert. Die Raum- und Möbelillustrationen sowie die Bilder der Lernpfade sind mit KI-Werkzeugen erzeugt.

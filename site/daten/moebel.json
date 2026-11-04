@@ -107,7 +107,7 @@
    },
    "interaktion": {
     "typ": "gesperrt",
-    "hinweis": "Dieses Flipchart wartet auf neue Projekte"
+    "hinweis": "Hier entsteht der nächste große Plan. Sobald jemand einen funktionierenden Stift findet."
    },
    "sprite": {
     "datei": "assets/moebel/pinnwand.png",
@@ -258,7 +258,7 @@
    },
    "interaktion": {
     "typ": "text",
-    "text": "Das Telefon klingelt. Anruf folgt."
+    "text": "Keine Anrufe"
    },
    "sprite": {
     "datei": "assets/moebel/telefon.png",
@@ -327,7 +327,7 @@
    },
    "interaktion": {
     "typ": "text",
-    "text": "Chucky schläft... wie immer."
+    "text": "Chucky schläft. Jemand, der seine Kapazitäten realistisch plant."
    },
    "sprite": {
     "datei": "assets/moebel/katze.png",

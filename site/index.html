@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <title>Probezeit</title>
 <style>
   :root {
@@ -31,39 +31,40 @@
     display: block;
     background: #000;
     outline-offset: 4px;
+    /* Vor dem ersten Skalieren durch hub.js darf die Halle die Seite nicht verbreitern (Handy: sonst zoomt der Browser heraus) */
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
   canvas:focus-visible { outline: 3px solid var(--akzent); }
-  #start {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    font: inherit;
-    font-size: 1.15rem;
-    line-height: 1.4;
-    padding: 16px;
-    color: var(--text);
-    background: rgba(14, 12, 18, 0.72);
-    border: 0;
-    cursor: pointer;
-  }
-  #start[hidden] { display: none; }
   #ergebnis { min-height: 1.3em; margin-top: 6px; color: var(--akzent); font-size: 0.92rem; }
   #leiste { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
   #leiste p { margin: 0; font-size: 0.92rem; }
-  #vollbild {
+  /* Knöpfe Hilfe und Vollbild, auf dem Büro oben rechts (auch im Vollbild sichtbar), für den Finger groß genug */
+  #werkzeuge { position: absolute; top: 6px; right: 6px; z-index: 4; display: flex; gap: 8px; line-height: 1.2; }
+  #werkzeuge button {
     font: inherit;
-    font-size: 0.92rem;
-    padding: 4px 12px;
+    font-size: 1rem;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 6px 16px;
     color: var(--text);
-    background: transparent;
+    background: rgba(14, 12, 18, 0.78);
     border: 2px solid var(--akzent);
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
   }
+  #werkzeuge button[hidden] { display: none; }
+  canvas { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  /* Eingebettet (iframe): die Überschrift bleibt für Screenreader, nimmt aber keinen Platz */
+  body.eingebettet { padding-block: 2px 8px; padding-inline: 8px; }
+  body.eingebettet h1 { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   /* Vollbild: nur die Halle, der Statustext bleibt für Screenreader */
   body.vollbild { padding: 0; overflow: hidden; }
   body.vollbild main { height: 100vh; display: flex; align-items: center; justify-content: center; }
   body.vollbild h1, body.vollbild #leiste, body.vollbild nav { display: none; }
+  body.vollbild #werkzeuge { top: 10px; right: 10px; }
   body.vollbild #ergebnis {
     position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
@@ -96,7 +97,8 @@
   #dialog-knoepfe { display: flex; gap: 12px; margin-top: 12px; }
   #dialog-knoepfe button {
     font: inherit;
-    padding: 8px 16px;
+    min-height: 48px;
+    padding: 10px 22px;
     border-radius: 4px;
     cursor: pointer;
     border: 2px solid var(--akzent);
@@ -129,7 +131,8 @@
   #overlay-kopf h2 { font-size: 1.1rem; margin: 0; flex: 1 1 220px; }
   #zurueck {
     font: inherit;
-    padding: 8px 14px;
+    min-height: 48px;
+    padding: 10px 18px;
     background: var(--akzent);
     color: #1d1a22;
     border: 0;
@@ -139,6 +142,18 @@
   #player { flex: 1 1 auto; max-width: 1000px; width: 100%; margin: 0 auto; background: #fff; min-height: 420px; }
   #player iframe { display: block; width: 100%; height: 100%; min-height: 420px; border: 0; }
   #lade { max-width: 1000px; width: 100%; margin: 0 auto 8px; }
+
+  /* Niedrige Fenster (zum Beispiel iframe mit 800 x 450): Kopf des Modul-Fensters schmaler, damit mehr Platz für die Folie bleibt */
+  @media (max-height: 560px) {
+    #overlay { padding-block: 4px; padding-inline: 8px; }
+    #overlay-kopf { margin-bottom: 4px; gap: 8px; }
+    #overlay-kopf h2 { font-size: 1rem; }
+    #zurueck { padding: 6px 14px; }
+    #lade:empty { display: none; }
+    #player, #player iframe { min-height: 0; }
+    /* Breite so wählen, dass Folie, Navigationsleiste und Kopf in die Fensterhöhe passen (Folie 16:8,1 Seitenverhältnis, etwa 190 Pixel Rahmen) */
+    #player { max-width: min(1000px, calc((100vh - 190px) / 0.506 + 40px)); }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
@@ -153,13 +168,15 @@
     <div id="buehne">
       <canvas id="halle" width="1280" height="720" tabindex="0"
               aria-label="Probezeit, ein Büro mit Möbeln und einer Tür. Türen und Objekte sind auch in der Liste unter der Halle erreichbar."></canvas>
-      <button id="start" type="button">Klicken zum Starten, dann Pfeiltasten oder WASD</button>
+      <div id="werkzeuge">
+        <button id="hilfe" type="button">Hilfe</button>
+        <button id="vollbild" type="button">Vollbild</button>
+      </div>
     </div>
   </div>
   <div id="ergebnis" role="status" aria-live="polite"></div>
   <div id="leiste">
-    <button id="vollbild" type="button">Vollbild</button>
-    <p id="hinweis">Steuerung: Pfeiltasten oder WASD zum Laufen, Leertaste oder Enter an einer Tür oder einem Objekt, F für Vollbild.</p>
+    <p id="hinweis">Steuerung: auf eine Stelle tippen oder klicken, Pfeiltasten oder WASD zum Laufen, Leertaste oder Enter an einer Tür oder einem Objekt, F für Vollbild.</p>
   </div>
 
   <nav aria-label="Türen und Objekte">

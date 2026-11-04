@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test Einbettung: Hub im iframe</title>
+<style>
+  body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; background: #eee; color: #222; line-height: 1.4; }
+  h1 { font-size: 1.3rem; margin: 0 0 6px; }
+  h2 { font-size: 1rem; margin: 18px 0 4px; }
+  p { margin: 4px 0 8px; max-width: 60em; }
+  iframe { display: block; border: 1px solid #888; background: #000; }
+  code { background: #ddd; padding: 0 3px; }
+</style>
+</head>
+<body>
+<h1>Test Einbettung: Hub im iframe</h1>
+<p>Der Hub (<code>index.html</code>) läuft hier in vier Rahmen: 960 x 540 und 800 x 450 Pixel, jeweils mit und ohne <code>allowfullscreen</code>.
+  So stellt sich Moodle eine eingebettete Seite vor. Ohne <code>allowfullscreen</code> und von einer anderen Herkunft darf der Rahmen kein Vollbild anfordern,
+  dann verschwindet der Vollbild-Knopf, und das Büro läuft trotzdem vollständig.</p>
+<p>Parameter: <code>?nur=960-mit</code>, <code>960-ohne</code>, <code>800-mit</code> oder <code>800-ohne</code> zeigt nur einen Rahmen.
+  <code>?debug=1</code> reicht der Hub-Seite den Testzugriff weiter. <code>?ursprung=http://localhost:8123/</code> setzt eine andere Herkunft vor die Adresse
+  des Hubs (Test mit fremdem Ursprung, die Standardadresse ist relativ).</p>
+<div id="rahmen"></div>
+<script>
+  (function () {
+    var p = new URLSearchParams(window.location.search);
+    var ursprung = p.get('ursprung') || '';
+    var nur = p.get('nur');
+    var weiter = p.get('debug') === '1' ? '?debug=1' : '';
+    var varianten = [
+      { id: '960-mit', b: 960, h: 540, voll: true },
+      { id: '960-ohne', b: 960, h: 540, voll: false },
+      { id: '800-mit', b: 800, h: 450, voll: true },
+      { id: '800-ohne', b: 800, h: 450, voll: false }
+    ];
+    var box = document.getElementById('rahmen');
+    varianten.forEach(function (v) {
+      if (nur && nur !== v.id) { return; }
+      var h2 = document.createElement('h2');
+      h2.textContent = v.b + ' x ' + v.h + (v.voll ? ', mit allowfullscreen' : ', ohne allowfullscreen');
+      var f = document.createElement('iframe');
+      f.id = 'rahmen-' + v.id;
+      f.title = 'Hub Probezeit, ' + v.b + ' x ' + v.h;
+      f.width = String(v.b);
+      f.height = String(v.h);
+      if (v.voll) { f.setAttribute('allowfullscreen', ''); }
+      f.src = ursprung + 'index.html' + weiter;
+      box.appendChild(h2);
+      box.appendChild(f);
+    });
+  })();
+</script>
+</body>
+</html>

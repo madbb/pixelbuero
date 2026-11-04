@@ -43,6 +43,65 @@
     return;
   }
 
+  // Niedriges Fenster (Hub im iframe mit etwa 800 x 450): Kopf und Ränder des Branching Scenario werden kleiner,
+  // damit die Folie ganz sichtbar bleibt. Betrifft nur das Aussehen der Hülle, nicht den Inhalt der Folien.
+  var KOMPAKT_CSS = '.h5p-branching-scenario .h5p-screen-header { height: auto !important; min-height: 0 !important; }'
+    + '.h5p-branching-scenario .h5p-title-wrapper { height: auto !important; padding-top: 6px !important; padding-bottom: 2px !important; }'
+    + '.h5p-branching-scenario .h5p-branching-header { height: auto !important; }'
+    + '.h5p-branching-scenario .h5p-branching-header h1 { font-size: 1.15rem !important; line-height: 1.2 !important; height: auto !important; margin: 0 !important; }'
+    + '.h5p-branching-scenario .h5p-branching-header .library-subtitle { display: none !important; }'
+    + '.h5p-branching-scenario .h5p-library-wrapper { padding-top: 4px !important; padding-bottom: 4px !important; height: auto !important; }';
+  function kompaktAnpassen() {
+    try {
+      var rahmen = document.querySelector('#player iframe');
+      var d = rahmen && rahmen.contentDocument;
+      if (!d || !d.head) { return; }
+      var hoehe = (window.parent && window.parent !== window ? window.parent.innerHeight : window.innerHeight);
+      var vorhanden = d.getElementById('kompakt-css');
+      if (hoehe <= 560 && !vorhanden) {
+        var st = d.createElement('style');
+        st.id = 'kompakt-css';
+        st.textContent = KOMPAKT_CSS;
+        d.head.appendChild(st);
+      } else if (hoehe > 560 && vorhanden) {
+        vorhanden.parentNode.removeChild(vorhanden);
+      }
+    } catch (e) { /* ohne Zugriff bleibt die Hülle, wie sie ist */ }
+  }
+  window.setInterval(kompaktAnpassen, 500);
+
+  // Klickt den Startknopf im Startbildschirm des Branching Scenario, sobald er da ist (höchstens 10 Sekunden suchen)
+  function kursStarten() {
+    var versuche = 0;
+    var takt = window.setInterval(function () {
+      versuche += 1;
+      try {
+        var rahmen = document.querySelector('#player iframe');
+        var d = rahmen && rahmen.contentDocument;
+        var knoepfe = d ? [].slice.call(d.querySelectorAll('button')) : [];
+        for (var i = 0; i < knoepfe.length; i++) {
+          if (/Kurs starten|Start the course/.test(knoepfe[i].textContent) && knoepfe[i].getBoundingClientRect().width > 0) {
+            knoepfe[i].click();
+            window.clearInterval(takt);
+            return;
+          }
+        }
+      } catch (e) { /* noch nicht geladen */ }
+      if (versuche > 50) { window.clearInterval(takt); }
+    }, 200);
+  }
+
+  // Module und ihre JSON-Dateien immer beim Server nachfragen (Rückfrage mit 304 ist billig). Sonst zeigt der Browser nach
+  // einem neuen Bau des Pakets die alte content.json, weil ein einfacher Dateiserver nur Last-Modified sendet.
+  if (window.fetch) {
+    var echtesFetch = window.fetch.bind(window);
+    window.fetch = function (url, optionen) {
+      var o = optionen || {};
+      if (!o.cache) { o = Object.assign({}, o, { cache: 'no-cache' }); }
+      return echtesFetch(url, o);
+    };
+  }
+
   try {
     var inst = new window.H5PStandalone.H5P(document.getElementById('player'), {
       h5pJsonPath: modul,
@@ -58,6 +117,8 @@
         });
       }
       melde({ typ: 'bereit', xapi: !!(window.H5P && window.H5P.externalDispatcher) });
+      // ?start=1: Der Startbildschirm des Kurses (Knopf "Kurs starten") entfällt, zum Beispiel bei der Einleitung
+      if (new URLSearchParams(window.location.search).get('start') === '1') { kursStarten(); }
     }).catch(function (err) {
       fehler(err && err.message ? err.message : String(err));
     });

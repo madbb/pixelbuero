@@ -16,6 +16,8 @@
   var ZONEN_RADIUS = 26;  // Halbe Kantenlänge der Interaktionszone um den Interaktionspunkt eines Möbelstücks
   var PLAYER_SEITE = 'player.html';
   var SPEICHER_KEY = 'pixelbuero.siegel.v2';
+  var MERKER_KEY = 'pixelbuero.einleitung.v1';   // Merker "Einleitung gesehen"
+  var EINLEITUNG_ID = 'einleitung-hub';           // Modul-id der Einleitung in welt.json
   var UEBERBLENDUNG_MS = 500;
 
   var buehne = document.getElementById('buehne');
@@ -30,6 +32,9 @@
   var zurueckBtn = document.getElementById('zurueck');
   var navListe = document.getElementById('tuerliste');
   var navTitel = document.getElementById('nav-titel');
+
+  // Im iframe (zum Beispiel in Moodle) bekommt die Halle den Platz der Überschrift
+  try { if (window.self !== window.top) { document.body.classList.add('eingebettet'); } } catch (e) { document.body.classList.add('eingebettet'); }
 
   var reduziert = false;
   try {
@@ -605,6 +610,17 @@
     try { window.localStorage.setItem(SPEICHER_KEY, JSON.stringify(siegel)); } catch (e) { /* läuft ohne Speicher weiter */ }
   }
 
+  // Merker "Einleitung gesehen". Ohne Speicher gilt der Merker nur für diese Sitzung im Arbeitsspeicher,
+  // die Einleitung erscheint dann bei jedem Start. Es gibt keine Fehlermeldung.
+  var einleitungGesehen = false;
+  function ladeMerker() {
+    try { einleitungGesehen = window.localStorage.getItem(MERKER_KEY) === '1'; } catch (e) { einleitungGesehen = false; }
+  }
+  function setzeMerker() {
+    einleitungGesehen = true;
+    try { window.localStorage.setItem(MERKER_KEY, '1'); } catch (e) { /* läuft ohne Speicher weiter */ }
+  }
+
   function rangFuer(modul, punkte) {
     var raenge = (modul && modul.raenge && modul.raenge.length) ? modul.raenge : [{ ab: 0, name: 'Teilnehmer' }];
     var name = raenge[0].name;
@@ -800,7 +816,6 @@
     if (inBedienelement(e.target)) { return; }
     var n = tastenName(e);
     var istF = e.key === 'f' || e.key === 'F';
-    if (startOffen && (n || istF)) { startSchliessen(); }
     if (istF) { e.preventDefault(); if (!e.repeat) { vollbildUmschalten(); } return; }
     if (!n) { return; }
     e.preventDefault();
@@ -1002,13 +1017,30 @@
   var aktivesModul = null;
 
   // Verarbeitet eine xAPI-Aussage, die player.html weitergereicht hat
+  var letzteFolie = 0;   // höchste Folie der Einleitung, die der Player gemeldet hat (xAPI progressed, ending-point)
+
   function ereignis(s) {
     if (!s || !s.verb || !s.verb.id || !aktivesModul) { return; }
-    if (s.verb.id.split('/').pop() !== 'completed') { return; }
+    var verb = s.verb.id.split('/').pop();
+    if (verb === 'progressed' && aktivesModul.id === EINLEITUNG_ID) {
+      var ext = (s.object && s.object.definition && s.object.definition.extensions) || {};
+      var ep = parseInt(ext['http://id.tincanapi.com/extension/ending-point'], 10);
+      if (ep > letzteFolie) { letzteFolie = ep; }
+      return;
+    }
+    if (verb !== 'completed') { return; }
     // Nur das Hauptobjekt zählt, Unterinhalte tragen subContentId in der Objekt-ID
     var oid = (s.object && s.object.id) || '';
     if (oid.indexOf('subContentId=') !== -1) { return; }
     var m = aktivesModul;
+    if (m.id === EINLEITUNG_ID) {
+      // Die Einleitung hat keine Punkte und kein Siegel. Vollständiger Durchlauf: Merker setzen, Fenster schließen, Büro freigeben.
+      // Vollständig heißt: Der Player hat die letzte Folie gemeldet (welt.json, folien). Der Weiter-Knopf des Players lässt sich
+      // sonst schon auf Folie 1 drücken und meldet dann auch completed. In dem Fall schließt das Fenster ohne Merker.
+      if (!m.folien || letzteFolie >= m.folien) { setzeMerker(); }
+      schliesseOverlay();
+      return;
+    }
     var score = s.result && s.result.score;
     var punkte = score && typeof score.raw === 'number' ? score.raw : null;
     var eintrag = siegel[m.id] || {};
@@ -1039,6 +1071,7 @@
     if (overlayOffen) { return; }
     overlayOffen = true;
     aktivesModul = modul;
+    letzteFolie = 0;
     tasten = {};
     weg = null;
     hoverAus();
@@ -1046,6 +1079,7 @@
     rueckfokus = vonElement || canvas;
     sitzung += 1;
     overlayTitel.textContent = modul.name;
+    zurueckBtn.textContent = 'Zurück zur Halle';
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
     ladeBox.textContent = 'Modul wird geladen ...';
@@ -1115,20 +1149,28 @@
   }
   window.addEventListener('resize', skaliere);
 
-  // ---------- Start-Overlay und Vollbild ----------
-  var startBtn = document.getElementById('start');
+  // ---------- Einleitung, Hilfe und Vollbild ----------
+  // Ablauf: Der Hub lädt. Fehlt der Merker "Einleitung gesehen", öffnet er sofort das Hilfe-Fenster mit dem Modul einleitung-hub.
+  // Mit Merker geht es direkt ins Büro. Ein Start-Overlay gibt es nicht. Das Vollbild wird nicht beim Start angefordert,
+  // sondern nur über den Vollbild-Knopf oder die Taste F.
   var vollbildBtn = document.getElementById('vollbild');
-  var startOffen = !!startBtn;
+  var hilfeBtn = document.getElementById('hilfe');
 
-  function startSchliessen() {
-    if (!startOffen) { return; }
-    startOffen = false;
-    startBtn.hidden = true;
-    canvas.focus();
+  function vollbildMoeglich() { return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); }
+
+  // Öffnet die Einleitung wie einen Lernpfad. Fehlt das Modul in welt.json, läuft das Büro ohne sie weiter.
+  // vonHilfe: Aufruf über den Hilfe-Knopf. Beim ersten Start lässt sich die Einleitung überspringen, das setzt keinen Merker.
+  function oeffneEinleitung(vonHilfe) {
+    var m = modulMap[EINLEITUNG_ID];
+    if (!m) { return; }
+    if (overlayOffen || dialogOffen) { return; }
+    oeffneOverlay(vonHilfe === true && hilfeBtn ? hilfeBtn : canvas, m);
+    zurueckBtn.textContent = vonHilfe === true ? 'Zurück zum Büro' : 'Einleitung überspringen';
   }
-  if (startBtn) { startBtn.addEventListener('click', startSchliessen); }
+  if (hilfeBtn) { hilfeBtn.addEventListener('click', function () { oeffneEinleitung(true); }); }
 
-  function vollbildUmschalten() {
+  function vollbildUmschalten(still) {
+    if (!vollbildMoeglich()) { return; }   // kein Fehler: das Büro läuft ohne Vollbild vollständig
     try {
       var p;
       if (istVollbild()) {
@@ -1136,15 +1178,15 @@
       } else {
         var el = document.documentElement;
         var req = el.requestFullscreen || el.webkitRequestFullscreen;
-        if (!req) { throw new Error('nicht unterstützt'); }
+        if (!req) { return; }
         p = req.call(el);
       }
-      if (p && p.catch) { p.catch(vollbildFehler); }
-    } catch (e) { vollbildFehler(e); }
+      if (p && p.catch) { p.catch(function (e) { if (still !== true) { vollbildFehler(e); } }); }
+    } catch (e) { if (still !== true) { vollbildFehler(e); } }
   }
 
   function vollbildFehler(e) {
-    ergebnisBox.textContent = 'Vollbild ist hier nicht möglich' + (e && e.message ? ' (' + e.message + ')' : '') + '. In einem iframe braucht es das Attribut allowfullscreen.';
+    ergebnisBox.textContent = 'Vollbild ist hier nicht möglich' + (e && e.message ? ' (' + e.message + ')' : '') + '.';
     canvas.focus();
   }
 
@@ -1158,6 +1200,12 @@
   document.addEventListener('fullscreenchange', nachVollbildwechsel);
   document.addEventListener('webkitfullscreenchange', nachVollbildwechsel);
   vollbildBtn.addEventListener('click', function () { vollbildUmschalten(); canvas.focus(); });
+  // Ohne Vollbild im Browser (zum Beispiel iframe ohne allowfullscreen) verschwinden Knopf und Hinweis auf die Taste F
+  if (!vollbildMoeglich()) {
+    vollbildBtn.hidden = true;
+    var hinweisText = document.getElementById('hinweis');
+    if (hinweisText) { hinweisText.textContent = hinweisText.textContent.replace(', F für Vollbild', ''); }
+  }
 
   // ---------- Zeichnen ----------
   function rechteck(r, farbe) {
@@ -1716,9 +1764,11 @@
     (w.module || []).forEach(function (m) { modulMap[m.id] = m; });
     if (!raeume[w.start]) { throw new Error('Der Startraum "' + w.start + '" gibt es nicht.'); }
     ladeSiegel();
+    ladeMerker();
     skaliere();
     ladeRaum(w.start, null);
     ergebnisBox.textContent = '';
+    if (!einleitungGesehen) { oeffneEinleitung(false); }
 
     if (DEBUG) {
       // Nur für Tests mit ?debug=1: Lesezugriff auf den Zustand
@@ -1766,7 +1816,8 @@
             ueberblendung = null;
           }
         },
-        faktor: function () { return { faktor: faktor, dpr: dpr, canvas: canvas.width + ' x ' + canvas.height, css: canvas.style.width + ' x ' + canvas.style.height, innen: window.innerWidth + ' x ' + window.innerHeight, vollbild: istVollbild(), startOffen: startOffen }; },
+        merker: function () { return einleitungGesehen; },
+        faktor: function () { return { faktor: faktor, dpr: dpr, canvas: canvas.width + ' x ' + canvas.height, css: canvas.style.width + ' x ' + canvas.style.height, innen: window.innerWidth + ' x ' + window.innerHeight, vollbild: istVollbild() }; },
         berechneFaktor: berechneFaktor,
         gehbar: function (x, y) { return frei(x, y); },
         groessen: function () {

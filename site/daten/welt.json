@@ -10,7 +10,7 @@
     {
       "id": "lernpfad-01-akten",
       "name": "Lernpfad 01: Lastenheft und Pflichtenheft",
-      "pfad": "test_standalone/h5p/test_v01",
+      "pfad": "test_standalone/h5p/lernpfad-01",
       "raenge": [
         {
           "ab": 0,
@@ -29,6 +29,19 @@
           "name": "Studioleitung"
         }
       ]
+    },
+    {
+      "id": "einleitung-hub",
+      "name": "Einleitung",
+      "pfad": "test_standalone/h5p/einleitung-hub",
+      "raenge": [
+        {
+          "ab": 0,
+          "name": "Praktikant"
+        }
+      ],
+      "ohne_tuer": true,
+      "folien": 4
     }
   ],
   "raeume": [
@@ -75,7 +88,7 @@
           "sichtbar": false,
           "ziel": {
             "typ": "gesperrt",
-            "hinweis": "Der Flur ist noch in Arbeit."
+            "hinweis": "Ich muss erstmal hier fertig werden."
           }
         }
       ],
